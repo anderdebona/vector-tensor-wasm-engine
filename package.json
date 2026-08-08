@@ -1,0 +1,35 @@
+{
+  "name": "vector-tensor-wasm-engine",
+  "version": "1.0.0",
+  "description": "High-Performance SIMD-Vectorized Tensor Compute Engine in Rust & WebAssembly for Edge AI Vector Search",
+  "main": "dist/server.js",
+  "type": "module",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "dev": "tsx src/server.ts",
+    "test": "vitest run"
+  },
+  "keywords": [
+    "rust",
+    "webassembly",
+    "wasm",
+    "simd",
+    "tensor-compute",
+    "vector-search",
+    "high-performance-computing",
+    "edge-ai"
+  ],
+  "author": "anderdebona",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^5.3.3",
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.11.0",
+    "tsx": "^4.7.0",
+    "vitest": "^1.2.0"
+  }
+}
