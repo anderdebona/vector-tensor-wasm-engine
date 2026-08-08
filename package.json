@@ -4,6 +4,9 @@
   "description": "High-Performance SIMD-Vectorized Tensor Compute Engine in Rust & WebAssembly for Edge AI Vector Search",
   "main": "dist/server.js",
   "type": "module",
+  "bin": {
+    "vector-simd": "./dist/cli.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "node dist/server.js",
