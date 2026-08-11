@@ -1,6 +1,6 @@
 {
   "name": "vector-tensor-wasm-engine",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "High-Performance SIMD-Vectorized Tensor Compute Engine in Rust & WebAssembly for Edge AI Vector Search",
   "main": "dist/server.js",
   "type": "module",

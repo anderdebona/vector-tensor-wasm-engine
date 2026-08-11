@@ -92,3 +92,35 @@ describe('IVF-Flat ANN Index', () => {
     }
   });
 });
+
+import { HNSWIndex } from '../src/simd/hnsw-index.js';
+import { TensorMatMul } from '../src/simd/matmul.js';
+
+describe('HNSW Index', () => {
+  it('should insert and search vectors', () => {
+    const idx = new HNSWIndex(4);
+    for (let i = 0; i < 20; i++) { const v = new Float32Array(4).fill(i); idx.insert(`v${i}`, v); }
+    const q = new Float32Array([5, 5, 5, 5]);
+    const results = idx.search(q, 3);
+    expect(results.length).toBe(3);
+    expect(results[0].distance).toBeLessThanOrEqual(results[1].distance);
+  });
+});
+
+describe('Tensor MatMul', () => {
+  it('should multiply matrices correctly', () => {
+    const a = new Float32Array([1, 2, 3, 4]); // 2x2
+    const b = new Float32Array([5, 6, 7, 8]); // 2x2
+    const c = TensorMatMul.multiply(a, b, 2, 2, 2);
+    expect(c[0]).toBe(19); expect(c[1]).toBe(22);
+  });
+  it('should transpose correctly', () => {
+    const m = new Float32Array([1, 2, 3, 4, 5, 6]); // 2x3
+    const t = TensorMatMul.transpose(m, 2, 3);
+    expect(t[0]).toBe(1); expect(t[1]).toBe(4);
+  });
+  it('should compute Frobenius norm', () => {
+    const m = new Float32Array([3, 4]); // ||[3,4]|| = 5
+    expect(TensorMatMul.frobenius(m)).toBeCloseTo(5, 5);
+  });
+});
