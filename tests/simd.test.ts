@@ -124,3 +124,49 @@ describe('Tensor MatMul', () => {
     expect(TensorMatMul.frobenius(m)).toBeCloseTo(5, 5);
   });
 });
+
+describe('CosineSimilarityWasmSIMD (v4.0.0)', () => {
+  it('should compute exact cosine similarity for parallel and orthogonal vectors', async () => {
+    const { CosineSimilarityWasmSIMD } = await import('../src/simd/cosine-simd.js');
+    const u = new Float32Array([1, 0, 0, 0]);
+    const v = new Float32Array([1, 0, 0, 0]);
+    expect(CosineSimilarityWasmSIMD.compute(u, v)).toBeCloseTo(1.0, 5);
+
+    const orth = new Float32Array([0, 1, 0, 0]);
+    expect(CosineSimilarityWasmSIMD.compute(u, orth)).toBeCloseTo(0.0, 5);
+  });
+
+  it('should batch rank vectors by cosine similarity', async () => {
+    const { CosineSimilarityWasmSIMD } = await import('../src/simd/cosine-simd.js');
+    const query = new Float32Array([1, 0, 0, 0]);
+    const matrix = [
+      { id: 'item-1', vector: new Float32Array([1, 0, 0, 0]) },
+      { id: 'item-2', vector: new Float32Array([0.5, 0.5, 0, 0]) },
+      { id: 'item-3', vector: new Float32Array([0, 1, 0, 0]) },
+    ];
+    const ranked = CosineSimilarityWasmSIMD.batchSearch(query, matrix, 2);
+    expect(ranked.length).toBe(2);
+    expect(ranked[0].id).toBe('item-1');
+    expect(ranked[0].score).toBeCloseTo(1.0, 4);
+  });
+});
+
+describe('KMeansClusteringEngine (v4.0.0)', () => {
+  it('should cluster multi-dimensional vectors into k groups', async () => {
+    const { KMeansClusteringEngine } = await import('../src/simd/kmeans-engine.js');
+    const engine = new KMeansClusteringEngine(2, 10);
+    const vectors = [
+      new Float32Array([1.0, 1.1]),
+      new Float32Array([1.2, 0.9]),
+      new Float32Array([10.0, 10.1]),
+      new Float32Array([9.8, 10.2]),
+    ];
+    const result = engine.fit(vectors);
+    expect(result.centroids.length).toBe(2);
+    expect(result.assignments.length).toBe(4);
+    expect(result.assignments[0]).toBe(result.assignments[1]);
+    expect(result.assignments[2]).toBe(result.assignments[3]);
+    expect(result.assignments[0]).not.toBe(result.assignments[2]);
+  });
+});
+
