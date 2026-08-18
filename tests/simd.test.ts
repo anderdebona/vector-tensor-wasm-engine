@@ -170,3 +170,53 @@ describe('KMeansClusteringEngine (v4.0.0)', () => {
   });
 });
 
+describe('ProductQuantizationIVFPQ (v5.0.0)', () => {
+  it('should encode high-dimensional vector into M subvector codes and compute ADC distance', async () => {
+    const { ProductQuantizationIVFPQ } = await import('../src/simd/product-quantization-ivfpq.js');
+    const pq = new ProductQuantizationIVFPQ(8, 2, 4);
+
+    const vec = [0.25, 0.35, 0.45, 0.55, 0.50, 0.60, 0.70, 0.80];
+    const encoded = pq.encode('v1', vec);
+
+    expect(encoded.codes.length).toBe(2);
+    expect(encoded.id).toBe('v1');
+
+    const query = [0.25, 0.35, 0.45, 0.55, 0.50, 0.60, 0.70, 0.80];
+    const dist = pq.computeADCDistance(query, encoded);
+    expect(dist).toBeGreaterThanOrEqual(0);
+
+    const stats = pq.getCodebookStats();
+    expect(stats.numSubspaces).toBe(2);
+    expect(stats.subvectorDim).toBe(4);
+  });
+});
+
+describe('SparseDenseSpMM (v5.0.0)', () => {
+  it('should compress matrix to CSR and perform SpMM multiplication saving FLOPs', async () => {
+    const { SparseDenseSpMM } = await import('../src/simd/sparse-dense-spmm.js');
+    const sparseA = [
+      [1, 0, 0, 0],
+      [0, 0, 2, 0],
+      [0, 3, 0, 0]
+    ];
+    const denseB = [
+      [1, 2],
+      [3, 4],
+      [5, 6],
+      [7, 8]
+    ];
+
+    const csr = SparseDenseSpMM.toCSR(sparseA);
+    expect(csr.values.length).toBe(3);
+    expect(csr.sparsityRatio).toBeGreaterThan(0.7);
+
+    const result = SparseDenseSpMM.multiply(csr, denseB);
+    expect(result.outputMatrix.length).toBe(3);
+    expect(result.outputMatrix[0]).toEqual([1, 2]); // row 0: 1*1 = 1, 1*2 = 2
+    expect(result.outputMatrix[1]).toEqual([10, 12]); // row 1: 2*5 = 10, 2*6 = 12
+    expect(result.outputMatrix[2]).toEqual([9, 12]); // row 2: 3*3 = 9, 3*4 = 12
+    expect(result.flopsSaved).toBeGreaterThan(0);
+  });
+});
+
+

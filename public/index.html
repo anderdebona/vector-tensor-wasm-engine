@@ -3,16 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rust/WASM SIMD Vector Tensor Compute Studio | anderdebona</title>
+  <title>Rust/WASM SIMD Vector Tensor Compute Studio v5.0.0 | anderdebona</title>
   <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #030712;
-      --panel: rgba(15, 23, 42, 0.8);
+      --panel: rgba(15, 23, 42, 0.85);
       --border: rgba(16, 185, 129, 0.25);
       --accent: #10b981;
       --cyan: #06b6d4;
       --purple: #8b5cf6;
+      --amber: #f59e0b;
       --text: #f9fafb;
       --text-dim: #94a3b8;
     }
@@ -22,158 +23,179 @@
     .brand { font-size: 1.6rem; font-weight: 700; background: linear-gradient(135deg, #06b6d4, #10b981); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
     .status-badge { background: rgba(6, 182, 212, 0.15); color: #67e8f9; border: 1px solid rgba(103, 232, 249, 0.3); padding: 0.35rem 0.85rem; border-radius: 9999px; font-size: 0.8rem; font-weight: 600; }
 
-    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
-    .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; text-align: center; }
-    .stat-val { font-size: 1.8rem; font-weight: 700; font-family: 'Fira Code', monospace; color: var(--cyan); margin-top: 0.25rem; }
-    .stat-lbl { font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
+    .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 0.75rem; margin-bottom: 1.5rem; }
+    .stat-card { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.85rem; text-align: center; }
+    .stat-val { font-size: 1.5rem; font-weight: 700; font-family: 'Fira Code', monospace; color: var(--cyan); margin-top: 0.2rem; }
+    .stat-lbl { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.05em; }
 
     .main-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
-    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; backdrop-filter: blur(12px); }
-    .panel-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; color: #a7f3d0; }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1.25rem; backdrop-filter: blur(12px); margin-bottom: 1.5rem; }
+    .panel-title { font-size: 1.05rem; font-weight: 600; margin-bottom: 0.75rem; display: flex; justify-content: space-between; align-items: center; color: #a7f3d0; }
 
     canvas { width: 100%; height: 220px; background: rgba(2, 6, 23, 0.95); border: 1px solid rgba(6, 182, 212, 0.2); border-radius: 0.5rem; display: block; margin-bottom: 1rem; }
 
-    .btn { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: 0.2s all; }
+    .btn { background: linear-gradient(135deg, #06b6d4, #0891b2); color: white; border: none; padding: 0.55rem 1rem; border-radius: 0.5rem; font-weight: 600; cursor: pointer; font-family: inherit; transition: 0.2s all; font-size: 0.85rem; }
     .btn:hover { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3); }
     .btn-green { background: linear-gradient(135deg, #10b981, #059669); }
+    .btn-purple { background: linear-gradient(135deg, #8b5cf6, #7c3aed); }
 
     .controls { display: flex; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap; }
-    pre { background: rgba(2, 6, 23, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem; border-radius: 0.5rem; font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #67e8f9; overflow-x: auto; max-height: 200px; }
+    pre { background: rgba(2, 6, 23, 0.95); border: 1px solid rgba(255, 255, 255, 0.08); padding: 0.75rem; border-radius: 0.5rem; font-family: 'Fira Code', monospace; font-size: 0.8rem; color: #67e8f9; overflow-x: auto; max-height: 180px; }
   </style>
 </head>
 <body>
   <header>
     <div>
-      <div class="brand">⚡ Rust/WASM SIMD Vector Tensor Compute Engine 🏎️</div>
-      <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.2rem;">128-bit Float32 SIMD Parallelism • KMeans Voronoi Partition • HNSW Index • by anderdebona</div>
+      <div class="brand">⚡ Rust/WASM SIMD Vector Tensor Compute Engine v5.0.0 🏎️</div>
+      <div style="font-size: 0.85rem; color: var(--text-dim); margin-top: 0.2rem;">IVF-PQ Product Quantization • CSR Sparse-Dense SpMM • 128-bit SIMD Parallelism • by anderdebona</div>
     </div>
-    <span class="status-badge">● WASM 128-bit SIMD Online</span>
+    <span class="status-badge">● WASM 128-bit SIMD v5.0 Active</span>
   </header>
 
   <div class="stats-row">
     <div class="stat-card">
-      <div class="stat-lbl">SIMD Throughput</div>
+      <div class="stat-lbl">SIMD Speedup</div>
       <div class="stat-val" id="statSpeedup">10.4x</div>
     </div>
     <div class="stat-card">
-      <div class="stat-lbl">Dot Ops / sec</div>
+      <div class="stat-lbl">PQ Compression</div>
+      <div class="stat-val" style="color: var(--accent);" id="statPqComp">8.0x</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">SpMM Sparsity</div>
+      <div class="stat-val" style="color: var(--amber);" id="statSparsity">75.0%</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">FLOPs Saved</div>
+      <div class="stat-val" style="color: #a78bfa;" id="statFlops">48 Ops</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">KMeans Clusters</div>
+      <div class="stat-val" style="color: var(--cyan);" id="statK">4</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-lbl">SIMD Dot Ops/s</div>
       <div class="stat-val" id="statOps">1.42M</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Cluster Partition</div>
-      <div class="stat-val" style="color: var(--purple);" id="statClusters">k = 4</div>
-    </div>
-    <div class="stat-card">
-      <div class="stat-lbl">Quantization Ratio</div>
-      <div class="stat-val" style="color: var(--accent);">4.0x (SQ8)</div>
     </div>
   </div>
 
   <div class="main-grid">
     <div class="panel">
       <div class="panel-title">
-        <span>🌌 Voronoi Vector Space Clustering (KMeans++)</span>
-        <span style="font-size: 0.75rem; color: var(--text-dim);">2D Projection</span>
+        <span>🌌 Voronoi KMeans Cluster Projection</span>
+        <span style="font-size: 0.8rem; color: var(--text-dim);">2D Vector Space</span>
       </div>
-      <canvas id="clusterCanvas"></canvas>
+      <canvas id="clusterCanvas" width="500" height="220"></canvas>
+
       <div class="controls">
-        <button class="btn btn-green" onclick="runKMeans(3)">Recluster (k=3)</button>
-        <button class="btn btn-green" onclick="runKMeans(4)">Recluster (k=4)</button>
-        <button class="btn btn-green" onclick="runKMeans(5)">Recluster (k=5)</button>
+        <button class="btn" onclick="runBenchmark()">⚡ Benchmark 1024-dim SIMD</button>
+        <button class="btn btn-green" onclick="runKMeans(4)">🎯 Re-Cluster KMeans (K=4)</button>
+        <button class="btn btn-purple" onclick="runPQ()">📦 Test IVF-PQ Codebook</button>
+        <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="runSpMM()">📐 SpMM Sparse MatMul</button>
       </div>
-      <pre id="clusterLog">Running KMeans++ initialization...</pre>
+
+      <div class="panel-title" style="margin-top: 1rem;">
+        <span>📦 IVF-PQ Product Quantization Codebook & ADC (v5.0.0)</span>
+      </div>
+      <pre id="pqLog">Awaiting Product Quantization...</pre>
     </div>
 
     <div class="panel">
       <div class="panel-title">
-        <span>⚡ SIMD vs Scalar Benchmark & Cosine Ranking</span>
+        <span>📐 Sparse-Dense Matrix Multiplication (SpMM CSR) (v5.0.0)</span>
       </div>
-      <div class="controls">
-        <button class="btn" onclick="runBenchmark()">Execute 10k SIMD Benchmark</button>
-        <button class="btn" style="background: rgba(255,255,255,0.1);" onclick="runCosineSearch()">Rank Cosine Similarity</button>
-      </div>
-      <pre id="benchLog">Click button to execute SIMD benchmark...</pre>
-      
+      <pre id="spmmLog">Awaiting SpMM multiplication...</pre>
+
       <div class="panel-title" style="margin-top: 1rem;">
-        <span>📐 Matrix MatMul BLAS Computation</span>
+        <span>🏎️ SIMD vs Scalar Microbenchmark Telemetry</span>
       </div>
-      <pre id="matrixLog">Awaiting matrix test...</pre>
+      <pre id="benchLog">Click benchmark to profile WebAssembly SIMD kernels...</pre>
+
+      <div class="panel-title" style="margin-top: 1rem;">
+        <span>🔍 Cosine Similarity Batch Ranking</span>
+      </div>
+      <pre id="cosineLog">Awaiting cosine ranker...</pre>
     </div>
   </div>
 
   <script>
-    const canvas = document.getElementById('clusterCanvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = canvas.offsetWidth;
-    canvas.height = 220;
-
-    const clusterColors = ['#06b6d4', '#10b981', '#f43f5e', '#a855f7', '#fbbf24'];
+    async function runBenchmark() {
+      const res = await fetch('/api/simd/benchmark', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ dimension: 1024, iterations: 10000 })
+      });
+      const data = await res.json();
+      document.getElementById('statSpeedup').innerText = `${data.speedup.toFixed(1)}x`;
+      document.getElementById('benchLog').innerText = JSON.stringify(data, null, 2);
+    }
 
     async function runKMeans(k = 4) {
-      document.getElementById('statClusters').innerText = `k = ${k}`;
       const res = await fetch('/api/simd/kmeans', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ k, numVectors: 90 })
       });
       const data = await res.json();
-      document.getElementById('clusterLog').innerText = JSON.stringify({
-        k: data.k,
-        iterations: data.iterations,
-        inertia: parseFloat(data.inertia.toFixed(2)),
-        centroids: data.centroids
-      }, null, 2);
+      document.getElementById('statK').innerText = k;
+      drawKMeans(data);
+    }
 
-      // Render on canvas
-      ctx.fillStyle = 'rgba(2, 6, 23, 0.95)';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    async function runPQ() {
+      const res = await fetch('/api/simd/pq', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('pqLog').innerText = JSON.stringify(data, null, 2);
+    }
 
-      const scaleX = canvas.width / 100;
-      const scaleY = canvas.height / 100;
+    async function runSpMM() {
+      const res = await fetch('/api/simd/spmm', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('statSparsity').innerText = `${data.spmmResult.sparsityPercent}%`;
+      document.getElementById('statFlops').innerText = `${data.spmmResult.flopsSaved} FLOPs`;
+      document.getElementById('spmmLog').innerText = JSON.stringify(data, null, 2);
+    }
 
-      // Draw points
-      data.points.forEach(pt => {
+    async function runCosine() {
+      const res = await fetch('/api/simd/cosine', { method: 'POST' });
+      const data = await res.json();
+      document.getElementById('cosineLog').innerText = JSON.stringify(data, null, 2);
+    }
+
+    function drawKMeans(data) {
+      const canvas = document.getElementById('clusterCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      const colors = ['#06b6d4', '#10b981', '#a855f7', '#f59e0b', '#f43f5e'];
+
+      (data.points || []).forEach(p => {
+        const px = (p.x / 100) * canvas.width;
+        const py = (p.y / 100) * canvas.height;
         ctx.beginPath();
-        ctx.arc(pt.x * scaleX, pt.y * scaleY, 4, 0, Math.PI * 2);
-        ctx.fillStyle = clusterColors[pt.cluster % clusterColors.length];
+        ctx.arc(px, py, 4, 0, Math.PI * 2);
+        ctx.fillStyle = colors[p.cluster % colors.length];
         ctx.fill();
       });
 
-      // Draw centroids with glow
-      data.centroids.forEach((c, idx) => {
+      (data.centroids || []).forEach((c, idx) => {
+        const cx = (c.x / 100) * canvas.width;
+        const cy = (c.y / 100) * canvas.height;
         ctx.beginPath();
-        ctx.arc(c.x * scaleX, c.y * scaleY, 8, 0, Math.PI * 2);
-        ctx.strokeStyle = '#ffffff';
-        ctx.lineWidth = 2;
-        ctx.fillStyle = clusterColors[idx % clusterColors.length];
+        ctx.arc(cx, cy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffffff';
         ctx.fill();
+        ctx.strokeStyle = colors[idx % colors.length];
+        ctx.lineWidth = 3;
         ctx.stroke();
       });
     }
 
-    async function runBenchmark() {
-      const res = await fetch('/api/simd/benchmark', { method: 'POST' });
-      const data = await res.json();
-      document.getElementById('statSpeedup').innerText = `${data.speedupFactor.toFixed(1)}x`;
-      document.getElementById('benchLog').innerText = JSON.stringify(data, null, 2);
-    }
-
-    async function runCosineSearch() {
-      const res = await fetch('/api/simd/cosine', { method: 'POST' });
-      const data = await res.json();
-      document.getElementById('benchLog').innerText = JSON.stringify(data, null, 2);
-    }
-
-    async function runMatrix() {
-      const res = await fetch('/api/matrix/multiply', { method: 'POST' });
-      const data = await res.json();
-      document.getElementById('matrixLog').innerText = JSON.stringify(data, null, 2);
-    }
-
     window.onload = () => {
-      runKMeans(4);
       runBenchmark();
-      runMatrix();
+      runKMeans(4);
+      runPQ();
+      runSpMM();
+      runCosine();
     };
   </script>
 </body>
